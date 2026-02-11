@@ -24,7 +24,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.variable} ${spaceGrotesk.variable} ${outfit.variable} antialiased transition-colors duration-300 font-sans`}>
+      <body
+        className={`${inter.variable} ${spaceGrotesk.variable} ${outfit.variable} antialiased transition-colors duration-300 font-sans`}
+        onContextMenu={e => e.preventDefault()}
+      >
         <ContentProvider>
           <Background />
           <div className="fixed top-4 right-4 z-50">
