@@ -1,0 +1,5 @@
+(Binary file placeholder)
+Instructions:
+User should place their actual photo here: my-portfolio/public/profile-placeholder.jpg
+For now this file will effectively be empty or a dummy if I could write binary. 
+Since I can't write binary efficiently, I will just rely on the fallback text I implemented in the Hero component.
