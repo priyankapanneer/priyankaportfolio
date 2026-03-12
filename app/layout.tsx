@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Background } from "@/components/Background";
 import { ContentProvider } from "@/context/ContentContext";
+import DisableRightClick from "@/components/DisableRightClick";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const spaceGrotesk = Space_Grotesk({ subsets: ["latin"], variable: "--font-space-grotesk" });
@@ -17,6 +18,8 @@ export const metadata: Metadata = {
   },
 };
 
+import { cn } from "@/lib/utils";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -25,10 +28,16 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${inter.variable} ${spaceGrotesk.variable} ${outfit.variable} antialiased transition-colors duration-300 font-sans`}
-        onContextMenu={e => e.preventDefault()}
+        className={cn(
+          inter.variable,
+          spaceGrotesk.variable,
+          outfit.variable,
+          "antialiased transition-colors duration-300 font-sans"
+        )}
+        suppressHydrationWarning
       >
         <ContentProvider>
+          <DisableRightClick />
           <Background />
           <div className="fixed top-4 right-4 z-50">
             <ThemeToggle />

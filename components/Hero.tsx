@@ -59,7 +59,14 @@ export function Hero() {
 
     return (
         <section id="home" className="min-h-screen flex items-center justify-center relative overflow-hidden pt-20 px-4">
-            <div className="container max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-12 lg:gap-24 items-center">
+            {/* Animated Floating Shapes */}
+            <div className="absolute inset-0 pointer-events-none z-0">
+                <div className="absolute top-10 left-1/4 w-60 h-60 bg-cyan-400/20 rounded-full blur-[80px] animate-blob animation-delay-2000" />
+                <div className="absolute bottom-10 right-1/4 w-72 h-72 bg-purple-500/20 rounded-full blur-[100px] animate-blob animation-delay-4000" />
+                <div className="absolute top-1/2 left-1/2 w-32 h-32 bg-primary/20 rounded-full blur-[60px] animate-blob" />
+            </div>
+
+            <div className="container max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-12 lg:gap-24 items-center relative z-10">
 
                 {/* Left Content */}
                 <motion.div
@@ -87,6 +94,9 @@ export function Hero() {
 
                     <motion.p
                         variants={itemVariants}
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 1, delay: 0.5 }}
                         className="text-lg md:text-xl text-muted-foreground/80 mb-10 leading-relaxed max-w-lg mx-auto lg:mx-0 font-light tracking-tight"
                     >
                         {profile.summary}
@@ -98,10 +108,20 @@ export function Hero() {
                     >
                         <a
                             href="#contact"
-                            className="px-8 py-4 bg-primary text-primary-foreground rounded-full font-black uppercase tracking-widest text-[11px] hover:shadow-[0_0_20px_rgba(16,110,190,0.5)] hover:-translate-y-1 transition-all duration-300"
+                            className="px-8 py-4 bg-primary text-primary-foreground rounded-full font-black uppercase tracking-widest text-[11px] hover:shadow-[0_0_20px_rgba(16,110,190,0.5)] hover:-translate-y-1 transition-all duration-300 active:scale-95 focus:ring-2 focus:ring-primary/40"
                         >
                             Contact Me
                         </a>
+                        {profile.resumeUrl && (
+                            <a
+                                href={profile.resumeUrl}
+                                download="Priyanka_Resume.pdf"
+                                className="px-8 py-4 bg-background border border-border text-foreground rounded-full font-black uppercase tracking-widest text-[11px] hover:border-primary hover:text-primary transition-all duration-300 flex items-center gap-2 active:scale-95 focus:ring-2 focus:ring-primary/40"
+                            >
+                                <Download className="w-4 h-4 animate-bounce" />
+                                Download Resume
+                            </a>
+                        )}
 
                     </motion.div>
 
@@ -114,14 +134,15 @@ export function Hero() {
                             { icon: Linkedin, href: profile.linkedin },
                             { icon: Mail, href: `mailto:${profile.email}` }
                         ].map((social, idx) => (
-                            <a
+                            <motion.a
                                 key={idx}
                                 href={social.href}
                                 target="_blank"
-                                className="p-3 bg-card border border-border rounded-full hover:text-primary hover:border-primary hover:shadow-[0_0_15px_rgba(16,110,190,0.3)] transition-all transform hover:scale-110 duration-300"
+                                whileHover={{ scale: 1.15, color: '#7f5af0', y: -4 }}
+                                className="p-3 bg-card border border-border rounded-full hover:text-primary hover:border-primary hover:shadow-[0_0_15px_rgba(16,110,190,0.3)] transition-all duration-300"
                             >
                                 <social.icon size={24} />
-                            </a>
+                            </motion.a>
                         ))}
                     </motion.div>
                 </motion.div>
@@ -131,13 +152,16 @@ export function Hero() {
                     initial={{ opacity: 0, scale: 0.8, rotate: 10 }}
                     animate={{ opacity: 1, scale: 1, rotate: 0 }}
                     transition={{ duration: 1, delay: 0.4, type: "spring" }}
+                    whileHover={{ scale: 1.03, boxShadow: '0 0 40px 0 rgba(127,90,240,0.12)' }}
                     className="relative order-1 lg:order-2 flex justify-center"
                 >
                     {/* Abstract Background Shapes */}
                     <div className="absolute inset-0 bg-gradient-to-tr from-cyan-400 to-purple-600 rounded-[60%_40%_30%_70%/60%_30%_70%_40%] blur-3xl opacity-40 animate-blob"></div>
 
                     <div className="relative w-72 h-72 md:w-96 md:h-96 rounded-full border-4 border-background shadow-2xl overflow-hidden ring-4 ring-cyan-500/20 group">
-                        <div className="absolute inset-0 bg-gradient-to-tr from-cyan-500/20 to-purple-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10 pointer-events-none"></div>
+                        <div className="absolute inset-0 bg-gradient-to-tr from-cyan-500/30 to-purple-500/30 opacity-80 group-hover:opacity-100 transition-opacity duration-500 z-10 pointer-events-none"></div>
+                        {/* Glow effect */}
+                        <div className="absolute inset-0 rounded-full bg-primary/10 blur-2xl opacity-0 group-hover:opacity-40 transition-opacity duration-700 z-10 pointer-events-none"></div>
                         {/* Placeholder for Profile Image - User needs to replace /profile-placeholder.jpg */}
                         <div className="w-full h-full bg-muted flex items-center justify-center text-muted-foreground">
                             {/* If image exists, it shows. Else fallback text */}

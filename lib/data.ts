@@ -13,24 +13,36 @@ export const profile = {
     mission: "To deliver high-performance, scalable solutions.\nEmpowering businesses through digital-first innovation.\nBuilding accessible and performant web applications.",
 };
 
-export const skills = {
-    frontend: [
-        { name: "Next.js", icon: "Code", level: "Expert", color: "#000000" },
-        { name: "React", icon: "Atom", level: "Expert", color: "#61DAFB" },
-        { name: "TypeScript", icon: "Cpu", level: "Advanced", color: "#3178C6" },
-        { name: "Tailwind CSS", icon: "Palette", level: "Expert", color: "#38B2AC" },
-    ],
-    backend: [
-        { name: "Node.js", icon: "Server", level: "Advanced", color: "#339933" },
-        { name: "Python", icon: "Terminal", level: "Intermediate", color: "#3776AB" },
-        { name: "PostgreSQL", icon: "Database", level: "Intermediate", color: "#336791" },
-    ],
-    tools: [
-        { name: "Git", icon: "GitBranch", level: "Advanced", color: "#F05032" },
-        { name: "Docker", icon: "Container", level: "Intermediate", color: "#2496ED" },
-        { name: "Figma", icon: "PenTool", level: "Advanced", color: "#F24E1E" },
-    ]
-};
+export const skills = [
+    {
+        id: "frontend",
+        title: "Frontend Architecture",
+        items: [
+            { name: "Next.js", icon: "Code", level: "Expert", color: "#000000" },
+            { name: "React", icon: "Atom", level: "Expert", color: "#61DAFB" },
+            { name: "TypeScript", icon: "Cpu", level: "Advanced", color: "#3178C6" },
+            { name: "Tailwind CSS", icon: "Palette", level: "Expert", color: "#38B2AC" },
+        ]
+    },
+    {
+        id: "backend",
+        title: "Core & Systems",
+        items: [
+            { name: "Node.js", icon: "Server", level: "Advanced", color: "#339933" },
+            { name: "Python", icon: "Terminal", level: "Intermediate", color: "#3776AB" },
+            { name: "PostgreSQL", icon: "Database", level: "Intermediate", color: "#336791" },
+        ]
+    },
+    {
+        id: "tools",
+        title: "Dev Ecosystem",
+        items: [
+            { name: "Git", icon: "GitBranch", level: "Advanced", color: "#F05032" },
+            { name: "Docker", icon: "Container", level: "Intermediate", color: "#2496ED" },
+            { name: "Figma", icon: "PenTool", level: "Advanced", color: "#F24E1E" },
+        ]
+    }
+];
 
 export const projects = [
     {
@@ -98,6 +110,13 @@ export const education = [
         year: "2023",
         description: "Intensive 6-month program covering MERN stack, cloud deployment, and system design.",
         certificateUrl: ""
+    },
+    {
+        degree: "Degree Title",
+        institution: "University/School",
+        year: "2024",
+        description: "Description of studies...",
+        fileUrl: ""
     }
 ];
 
@@ -113,6 +132,13 @@ export const certificates = [
         issuer: "Coursera",
         date: "May 2023",
         link: "#"
+    },
+    {
+        title: "Certificate Name",
+        issuer: "Issuer Organization",
+        date: "2024",
+        link: "#",
+        fileUrl: ""
     }
 ];
 

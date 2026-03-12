@@ -56,16 +56,32 @@ export default function AdminPage() {
     };
 
     // Generic Add/Delete Handlers
-    const addSkill = (category: keyof typeof skills) => {
-        const newSkills = { ...skills };
-        newSkills[category].push({ name: "New Skill", icon: "Circle", level: "Beginner", color: "#000000" });
+    const addSkill = (categoryIndex: number) => {
+        const newSkills = [...skills];
+        newSkills[categoryIndex].items.push({ name: "New Skill", icon: "Circle", level: "Beginner", color: "#000000" });
         updateContent("skills", newSkills);
     };
 
-    const deleteSkill = (category: keyof typeof skills, index: number) => {
+    const deleteSkill = (categoryIndex: number, skillIndex: number) => {
         if (!confirm("Delete this skill?")) return;
-        const newSkills = { ...skills };
-        newSkills[category].splice(index, 1);
+        const newSkills = [...skills];
+        newSkills[categoryIndex].items.splice(skillIndex, 1);
+        updateContent("skills", newSkills);
+    };
+
+    const addCategory = () => {
+        const newSkills = [...skills, { 
+            id: `cat-${Date.now()}`, 
+            title: "New Category", 
+            items: [{ name: "New Skill", icon: "Circle", level: "Beginner", color: "#000000" }] 
+        }];
+        updateContent("skills", newSkills);
+    };
+
+    const deleteCategory = (index: number) => {
+        if (!confirm("Delete this entire category and all its skills?")) return;
+        const newSkills = [...skills];
+        newSkills.splice(index, 1);
         updateContent("skills", newSkills);
     };
 
@@ -92,7 +108,8 @@ export default function AdminPage() {
             degree: "Degree Title",
             institution: "University/School",
             year: "2024",
-            description: "Description of studies..."
+            description: "Description of studies...",
+            fileUrl: ""
         }];
         updateContent("education", newEdu);
     };
@@ -312,24 +329,47 @@ export default function AdminPage() {
 
                         {activeTab === "skills" && (
                             <div className="space-y-8">
-                                <h2 className="text-2xl font-bold">Manage Skills</h2>
+                                <div className="flex items-center justify-between">
+                                    <h2 className="text-2xl font-bold">Manage Skills</h2>
+                                    <button onClick={addCategory} className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-bold shadow hover:bg-primary/90">
+                                        <Plus size={16} /> Add New Category
+                                    </button>
+                                </div>
 
-                                {Object.keys(skills).map((cat) => {
-                                    const category = cat as keyof typeof skills;
-                                    return (
-                                        <div key={category} className="space-y-3">
+                                {Array.isArray(skills) && skills.map((category: any, catIdx: number) => (
+                                    <div key={category.id} className="space-y-4 p-6 bg-muted/20 border border-border rounded-2xl relative group/cat">
+                                        <button 
+                                            onClick={() => deleteCategory(catIdx)} 
+                                            className="absolute top-4 right-4 text-muted-foreground hover:text-destructive opacity-0 group-hover/cat:opacity-100 transition-opacity"
+                                            title="Delete Category"
+                                        >
+                                            <Trash2 size={18} />
+                                        </button>
+
+                                        <div className="space-y-1 max-w-md">
+                                            <label className="text-xs uppercase font-bold text-muted-foreground">Category Title</label>
+                                            <input
+                                                value={category.title}
+                                                onChange={e => {
+                                                    const newSkills = [...skills];
+                                                    newSkills[catIdx].title = e.target.value;
+                                                    updateContent("skills", newSkills);
+                                                }}
+                                                className="w-full p-2 bg-card rounded-lg border border-input text-lg font-bold"
+                                            />
+                                        </div>
+
+                                        <div className="space-y-3">
                                             <div className="flex items-center justify-between">
-                                                <h3 className="text-lg font-semibold capitalize flex items-center gap-2">
-                                                    <span className="w-2 h-2 rounded-full bg-primary" /> {category}
-                                                </h3>
-                                                <button onClick={() => addSkill(category)} className="text-xs flex items-center gap-1 text-primary hover:underline">
+                                                <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Skills in this category</h3>
+                                                <button onClick={() => addSkill(catIdx)} className="text-xs flex items-center gap-1 text-primary hover:underline font-bold">
                                                     <Plus size={14} /> Add Skill
                                                 </button>
                                             </div>
 
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                                {skills[category].map((skill: any, idx: number) => (
-                                                    <div key={idx} className="flex items-center gap-3 p-3 bg-muted/40 rounded-xl border border-border group">
+                                                {category.items.map((skill: any, skillIdx: number) => (
+                                                    <div key={skillIdx} className="flex items-center gap-3 p-3 bg-card rounded-xl border border-border group">
                                                         <div
                                                             className="w-10 h-10 rounded-lg flex items-center justify-center text-white text-xs font-bold"
                                                             style={{ backgroundColor: skill.color }}
@@ -340,8 +380,10 @@ export default function AdminPage() {
                                                             <input
                                                                 value={skill.name}
                                                                 onChange={(e) => {
-                                                                    const newSkills = { ...skills };
-                                                                    newSkills[category][idx].name = e.target.value;
+                                                                    const newSkills = [...skills];
+                                                                    const newItems = [...newSkills[catIdx].items];
+                                                                    newItems[skillIdx] = { ...newItems[skillIdx], name: e.target.value };
+                                                                    newSkills[catIdx] = { ...newSkills[catIdx], items: newItems };
                                                                     updateContent("skills", newSkills);
                                                                 }}
                                                                 className="w-full bg-transparent border-none text-sm font-bold focus:ring-0 p-0"
@@ -351,8 +393,10 @@ export default function AdminPage() {
                                                                     type="color"
                                                                     value={skill.color}
                                                                     onChange={(e) => {
-                                                                        const newSkills = { ...skills };
-                                                                        newSkills[category][idx].color = e.target.value;
+                                                                        const newSkills = [...skills];
+                                                                        const newItems = [...newSkills[catIdx].items];
+                                                                        newItems[skillIdx] = { ...newItems[skillIdx], color: e.target.value };
+                                                                        newSkills[catIdx] = { ...newSkills[catIdx], items: newItems };
                                                                         updateContent("skills", newSkills);
                                                                     }}
                                                                     className="w-6 h-6 rounded overflow-hidden cursor-pointer border-none p-0"
@@ -360,8 +404,10 @@ export default function AdminPage() {
                                                                 <select
                                                                     value={skill.level}
                                                                     onChange={(e) => {
-                                                                        const newSkills = { ...skills };
-                                                                        newSkills[category][idx].level = e.target.value;
+                                                                        const newSkills = [...skills];
+                                                                        const newItems = [...newSkills[catIdx].items];
+                                                                        newItems[skillIdx] = { ...newItems[skillIdx], level: e.target.value };
+                                                                        newSkills[catIdx] = { ...newSkills[catIdx], items: newItems };
                                                                         updateContent("skills", newSkills);
                                                                     }}
                                                                     className="text-xs bg-muted rounded border-transparent"
@@ -373,15 +419,15 @@ export default function AdminPage() {
                                                                 </select>
                                                             </div>
                                                         </div>
-                                                        <button onClick={() => deleteSkill(category, idx)} className="text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity">
+                                                        <button onClick={() => deleteSkill(catIdx, skillIdx)} className="text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity">
                                                             <Trash2 size={16} />
                                                         </button>
                                                     </div>
                                                 ))}
                                             </div>
                                         </div>
-                                    );
-                                })}
+                                    </div>
+                                ))}
                             </div>
                         )}
 
@@ -528,22 +574,22 @@ export default function AdminPage() {
                                         <div className="flex items-center gap-4 mt-2">
                                             <div className="flex-1">
                                                 <label className="flex items-center gap-2 px-3 py-2 bg-muted border border-input rounded-lg cursor-pointer hover:bg-muted/80 w-fit text-xs font-semibold">
-                                                    <Upload size={14} /> Upload Certificate Image
+                                                    <Upload size={14} /> Upload Certificate Image/PDF
                                                     <input
                                                         type="file"
                                                         className="hidden"
-                                                        accept="image/*"
+                                                        accept="image/*,.pdf"
                                                         onChange={(e) => {
                                                             const file = e.target.files?.[0];
                                                             if (file) {
-                                                                if (file.size > 500 * 1024) {
-                                                                    alert("File too large! Please choose an image under 500KB.");
+                                                                if (file.size > 2 * 1024 * 1024) {
+                                                                    alert("File too large! Please choose a file under 2MB.");
                                                                     return;
                                                                 }
                                                                 const reader = new FileReader();
                                                                 reader.onloadend = () => {
                                                                     const n = [...education];
-                                                                    n[idx].certificateUrl = reader.result as string; // Stores Base64
+                                                                    n[idx].fileUrl = reader.result as string; // Store Base64
                                                                     updateContent("education", n);
                                                                 };
                                                                 reader.readAsDataURL(file);
@@ -553,10 +599,40 @@ export default function AdminPage() {
                                                 </label>
                                             </div>
                                             {/* Preview if exists */}
-                                            {edu.certificateUrl && (
+                                            {edu.fileUrl && edu.fileUrl.startsWith('data:image') && (
                                                 <div className="w-10 h-10 rounded border border-border overflow-hidden relative group-hover/cert:opacity-100">
-                                                    <img src={edu.certificateUrl} alt="Cert" className="w-full h-full object-cover" />
+                                                    <img src={edu.fileUrl} alt="Cert" className="w-full h-full object-cover" />
                                                 </div>
+                                            )}
+                                            {edu.fileUrl && edu.fileUrl.startsWith('data:application/pdf') && (
+                                                <div className="w-10 h-10 rounded border border-border overflow-hidden relative flex items-center justify-center bg-white">
+                                                    <span className="text-xs font-bold text-primary">PDF</span>
+                                                </div>
+                                            )}
+                                            {edu.fileUrl && (
+                                                <button
+                                                    onClick={() => {
+                                                        if (edu.fileUrl.startsWith('data:image')) {
+                                                            const win = window.open();
+                                                            if (win) {
+                                                                win.document.write(`
+                                                                        <html>
+                                                                            <head><title>Certificate</title></head>
+                                                                            <body style='margin:0;display:flex;align-items:center;justify-content:center;background:#111;'>
+                                                                                <img src='${edu.fileUrl}' alt='Certificate' style='max-width:100vw;max-height:100vh;object-fit:contain;box-shadow:0 0 20px rgba(0,0,0,0.5);'/>
+                                                                            </body>
+                                                                        </html>
+                                                                    `);
+                                                                win.document.close();
+                                                            }
+                                                        } else if (edu.fileUrl.startsWith('data:application/pdf')) {
+                                                            window.open(edu.fileUrl, '_blank');
+                                                        }
+                                                    }}
+                                                    className="ml-2 px-3 py-1.5 bg-primary text-primary-foreground rounded-lg text-xs font-bold shadow hover:bg-primary/90 transition-all"
+                                                >
+                                                    View Certificate
+                                                </button>
                                             )}
                                         </div>
                                     </div>
@@ -583,6 +659,46 @@ export default function AdminPage() {
                                         </div>
                                         <input value={cert.issuer} onChange={(e) => { const n = [...certificates]; n[idx].issuer = e.target.value; updateContent("certificates", n) }} className="w-full p-2 bg-muted rounded-lg text-sm" placeholder="Issuer" />
                                         <input value={cert.link} onChange={(e) => { const n = [...certificates]; n[idx].link = e.target.value; updateContent("certificates", n) }} className="w-full p-2 bg-muted rounded-lg text-sm text-primary" placeholder="Credential URL" />
+                                        {/* Certificate Image/PDF Upload */}
+                                        <div className="flex items-center gap-4 mt-2">
+                                            <div className="flex-1">
+                                                <label className="flex items-center gap-2 px-3 py-2 bg-muted border border-input rounded-lg cursor-pointer hover:bg-muted/80 w-fit text-xs font-semibold">
+                                                    <Upload size={14} /> Upload Certificate Image/PDF
+                                                    <input
+                                                        type="file"
+                                                        className="hidden"
+                                                        accept="image/*,.pdf"
+                                                        onChange={(e) => {
+                                                            const file = e.target.files?.[0];
+                                                            if (file) {
+                                                                if (file.size > 2 * 1024 * 1024) {
+                                                                    alert("File too large! Please choose a file under 2MB.");
+                                                                    return;
+                                                                }
+                                                                const reader = new FileReader();
+                                                                reader.onloadend = () => {
+                                                                    const n = [...certificates];
+                                                                    n[idx].fileUrl = reader.result as string; // Store Base64
+                                                                    updateContent("certificates", n);
+                                                                };
+                                                                reader.readAsDataURL(file);
+                                                            }
+                                                        }}
+                                                    />
+                                                </label>
+                                            </div>
+                                            {/* Preview if exists */}
+                                            {cert.fileUrl && cert.fileUrl.startsWith('data:image') && (
+                                                <div className="w-10 h-10 rounded border border-border overflow-hidden relative group-hover/cert:opacity-100">
+                                                    <img src={cert.fileUrl} alt="Cert" className="w-full h-full object-cover" />
+                                                </div>
+                                            )}
+                                            {cert.fileUrl && cert.fileUrl.startsWith('data:application/pdf') && (
+                                                <div className="w-10 h-10 rounded border border-border overflow-hidden relative flex items-center justify-center bg-white">
+                                                    <span className="text-xs font-bold text-primary">PDF</span>
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
                                 ))}
                             </div>

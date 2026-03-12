@@ -39,7 +39,8 @@ const defaultVisuals: VisualSettings = {
     blobColors: {
         first: "bg-purple-300 dark:bg-purple-900",
         second: "bg-yellow-300 dark:bg-yellow-900",
-        third: "bg-pink-300 dark:bg-pink-900",
+        third: "bg-pink-300 dark:bg-pink-900"
+        // If you need fileUrl, add: fileUrl: "" or remove entirely
     }
 };
 
@@ -56,6 +57,7 @@ export function ContentProvider({ children }: { children: React.ReactNode }) {
         achievements: defaultData.achievements,
         blogs: defaultData.blogs,
         visuals: defaultVisuals
+        // If you need fileUrl, add: fileUrl: "" or remove entirely
     });
 
     const [isLoaded, setIsLoaded] = useState(false);
@@ -68,6 +70,20 @@ export function ContentProvider({ children }: { children: React.ReactNode }) {
                 if (response.ok) {
                     const savedData = await response.json();
                     if (savedData) {
+                        // Migrate skills if they are in the old object format
+                        if (savedData.skills && typeof savedData.skills === 'object' && !Array.isArray(savedData.skills)) {
+                            const oldSkills = savedData.skills;
+                            const titles = oldSkills.titles || {
+                                frontend: "Frontend Architecture",
+                                backend: "Core & Systems",
+                                tools: "Dev Ecosystem"
+                            };
+                            savedData.skills = [
+                                { id: "frontend", title: titles.frontend, items: oldSkills.frontend || [] },
+                                { id: "backend", title: titles.backend, items: oldSkills.backend || [] },
+                                { id: "tools", title: titles.tools, items: oldSkills.tools || [] }
+                            ];
+                        }
                         setContent(prev => ({ ...prev, ...savedData }));
                     }
                 }
@@ -98,6 +114,7 @@ export function ContentProvider({ children }: { children: React.ReactNode }) {
             }
 
             alert("Changes Saved to Server! \n\nUpdates are now live for ALL visitors.");
+            window.location.reload();
         } catch (e: any) {
             if (e.message?.includes("Payload Too Large")) {
                 alert("⚠️ Save Failed: Data too large for server (Check your images).");
@@ -137,7 +154,19 @@ export function ContentProvider({ children }: { children: React.ReactNode }) {
         }
     };
 
-    if (!isLoaded) return null; // or a loading spinner
+    if (!isLoaded) {
+        return (
+            <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f8fafc' }}>
+                <div style={{ textAlign: 'center' }}>
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="animate-spin mx-auto mb-4">
+                        <circle cx="12" cy="12" r="10" strokeOpacity="0.2" />
+                        <path d="M12 2a10 10 0 0 1 10 10" />
+                    </svg>
+                    <div style={{ fontSize: '1.25rem', color: '#6366f1', fontWeight: 'bold' }}>Loading content...</div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <ContentContext.Provider value={{
